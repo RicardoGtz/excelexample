@@ -1,7 +1,9 @@
 import java.io.*;
 import java.rmi.server.ExportException;
 
+import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.*;
 
@@ -50,7 +52,29 @@ public class ExcelReader{
                     auxCell=auxRow.getCell(j);
                     //Verifies if cell isn't blank
                     if(auxCell!=null){
-                        newRow.createCell(j).setCellValue(auxCell.toString());
+                       /* XSSFCellStyle style = workbook.createCellStyle();
+                        style.setDataFormat();*/
+                        //XSSFCellStyle style=auxCell.getCellStyle();
+
+                        //Gets the type of the cell
+                       CellType type=auxCell.getCellType();
+                       //Verifies if cell is Numeric type(numbers, fractions, dates)
+                       if(type == CellType.NUMERIC) {
+                           //System.out.println(auxCell.toString());
+
+                           //Verifies if is date formatted
+                           if(HSSFDateUtil.isCellDateFormatted(auxCell)) {
+                               //System.out.println("Es Fecha");
+                               newRow.createCell(j).setCellValue(auxCell.toString());
+                           }else{
+                               newRow.createCell(j).setCellValue(Double.parseDouble(auxCell.toString()));
+                           }
+                       //Verifies if is a Formula
+                       }else if(type == CellType.FORMULA){
+                           newRow.createCell(j).setCellValue(auxCell.getNumericCellValue());
+                       }else{
+                           newRow.createCell(j).setCellValue(auxCell.toString());
+                       }
                     }else{
                         throw new ExcelReaderException("Blank cell at row:"+(i+1)+" column:"+(j+1));
                     }
