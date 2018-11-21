@@ -72,11 +72,10 @@ public class ExcelReader{
             XSSFCell cell=row.getCell(i);
             //Verifies if cell isn't empty
             if(cell!=null) {
-                /* Verifies format i.e. "123.2" or "123", if true, adds
-                   an "N" before the value and add into file,
-                   in other case just add into file */
+                /* Verifies format i.e. "123.2" or "123", if true, throws an
+                 * exception to notify this error  */
                 if (cell.toString().matches("\\d*\\.*\\d*"))
-                    newRow.createCell(i).setCellValue("N" + cell.toString());
+                    throw new ExcelReaderException("Title cells must be alphanumeric. Format problem at row:0 column:"+(i+1));
                 else
                     newRow.createCell(i).setCellValue(cell.toString());
             }else{
